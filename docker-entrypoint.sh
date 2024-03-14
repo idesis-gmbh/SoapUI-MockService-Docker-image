@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 #
 # Default usage: docker-entrypoint.sh start-soapui
@@ -59,16 +59,16 @@ if [ "$1" = 'start-soapui' ]; then
 
     if [ -z "$MOCK_SERVICE_PATH" ]; then
         echo "Starting Mock-service=$MOCK_SERVICE_NAME using default mockservice url-path from SoapUI-project=$PROJECT"
-        gosu soapui mockservicerunner.sh -Djava.awt.headless=true -Dfile.encoding=UTF8 -p 8080 -m "$MOCK_SERVICE_NAME" $PROJECT <&3 &
+        $SOAPUI_DIR/bin/mockservicerunner.sh -Djava.awt.headless=true -Dfile.encoding=UTF8 -p 8080 -m "$MOCK_SERVICE_NAME" $PROJECT <&3 &
     else
         echo "Starting Mock-service=$MOCK_SERVICE_NAME using url-path=$MOCK_SERVICE_PATH from SoapUI-project=$PROJECT"
-        gosu soapui mockservicerunner.sh -Djava.awt.headless=true -Dfile.encoding=UTF8 -p 8080 -m "$MOCK_SERVICE_NAME" -a $MOCK_SERVICE_PATH $PROJECT <&3 &
+        $SOAPUI_DIR/bin/mockservicerunner.sh -Djava.awt.headless=true -Dfile.encoding=UTF8 -p 8080 -m "$MOCK_SERVICE_NAME" -a $MOCK_SERVICE_PATH $PROJECT <&3 &
     fi
 
 else
     echo "You can start the Mock-service manually by running"
     echo ">>>  mockservicerunner.sh -Djava.awt.headless=true -Dfile.encoding=UTF8 -p 8080 -m $MOCK_SERVICE_NAME $PROJECT"
-    gosu soapui "$@" <&3 &
+    $SOAPUI_DIR/bin/soapui.sh "$@" <&3 &
 fi
 
 # wait for mocksevicerunner to exit
