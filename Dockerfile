@@ -97,4 +97,3 @@ RUN find $SOAPUI_PRJ -type f -exec chmod 660 {} \;
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["start-soapui"]
-#CMD ["su", "-s", "/bin/sh", "soapui"]
