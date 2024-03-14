@@ -13,14 +13,14 @@ ENV PATH "${JAVA_HOME}/bin:${PATH}"
 # Download and unpack soapui
 ##########################################################
 
-RUN addgroup --gid "1000" --system soapui
-RUN adduser --uid "1000" --ingroup "soapui" --home "/home/soapui" --system --disabled-password soapui
+
+RUN addgroup -S -g 1000 soapui && adduser -S -u 1000 -G soapui --disabled-password --gecos "" -h /home/soapui soapui
 
 RUN apk update \
-    && apk add --allow-untrusted \
+    && apk add --allow-untrusted --no-cache \
         curl \
+        tar \
     && apk cache clean
-
 
 RUN curl -kLO https://dl.eviware.com/soapuios/5.7.2/SoapUI-5.7.2-linux-bin.tar.gz && \
     echo "0cffcbee929bd2abb484f7ab0e8ad495  SoapUI-5.7.2-linux-bin.tar.gz" >> MD5SUM && \
@@ -31,6 +31,33 @@ RUN curl -kLO https://dl.eviware.com/soapuios/5.7.2/SoapUI-5.7.2-linux-bin.tar.g
 RUN chown -R soapui:soapui /home/soapui
 RUN find /home/soapui -type d -exec chmod 770 {} \;
 RUN find /home/soapui -type f -exec chmod 660 {} \;
+
+##########################################################
+# Install Gosu (used in docker-entrypoint.sh)
+##########################################################
+ENV GOSU_VERSION 1.17
+RUN set -eux
+RUN apk add --no-cache --virtual .gosu-deps \
+        ca-certificates \
+        dpkg \
+        gnupg \
+    ; \
+    \
+    dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
+    wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch"; \
+    wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc"; \
+    \
+# verify the signature
+    export GNUPGHOME="$(mktemp -d)"; \
+    gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4; \
+    gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu; \
+    command -v gpgconf && gpgconf --kill all || :; \
+    rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc; \
+    \
+# clean up fetch dependencies
+    apk del --no-network .gosu-deps; \
+    \
+    chmod +x /usr/local/bin/gosu;
 
 ############################################
 # Setup MockService runner
