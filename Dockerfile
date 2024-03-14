@@ -67,6 +67,7 @@ USER soapui
 ENV HOME /home/soapui
 ENV SOAPUI_DIR /home/soapui/SoapUI-5.7.2
 ENV SOAPUI_PRJ /home/soapui/soapui-prj
+ENV SOAPUI_PORT 8080
 
 ############################################
 # Add customization sub-directories (for entrypoint)
@@ -95,5 +96,6 @@ RUN find $SOAPUI_PRJ -type f -exec chmod 660 {} \;
 # Start SoapUI mock service runner
 ############################################
 
+EXPOSE 8080/tcp
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["start-soapui"]
