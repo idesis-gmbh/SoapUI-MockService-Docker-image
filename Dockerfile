@@ -2,10 +2,9 @@
 # Create an extensible SoapUI mock service runner image #
 #########################################################
 
-# Creating a JRE
-FROM eclipse-temurin:11-jre-alpine
+FROM alpine
 
-LABEL maintainer="Andreas Mersch <andreas.mersch@idesis.de>"
+LABEL maintainer="fbascheper <temp01@fam-scheper.nl>"
 ENV JAVA_HOME=/opt/java/openjdk
 ENV PATH "${JAVA_HOME}/bin:${PATH}"
 
@@ -18,6 +17,7 @@ RUN addgroup -S -g 1000 soapui && adduser -S -u 1000 -G soapui --disabled-passwo
 
 RUN apk update \
     && apk add --allow-untrusted --no-cache \
+        openjdk11-jre \
         curl \
         tar \
     && apk cache clean
